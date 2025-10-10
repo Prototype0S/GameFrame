@@ -23,8 +23,8 @@ pip install -r requirements.txt
 
 ## Documentation
 
-Full documentation can found at [https://damom73.github.io/GameFrame/]
+Full documentation can found at [https://damom73.github.io/GameFrame/](https://damom73.github.io/GameFrame/)
 
 ## Tutorials
 
-A tutorial series using GameFrame can be found at [https://damom73.github.io/space-rescue-tutorials/]
+A tutorial series using GameFrame can be found at [https://damom73.github.io/space-rescue-tutorials/](https://damom73.github.io/space-rescue-tutorials/)
