@@ -192,7 +192,7 @@ class RoomObject:
 
     def key_pressed(self, key):
         """
-        Handles key press events.
+        Handles key press events, if handle_key_events is True.
         Override in subclasses for custom key handling.
 
         Args:
@@ -213,7 +213,7 @@ class RoomObject:
 
     def clicked(self, button_number):
         """
-        Handles mouse click events.
+        Handles mouse click events, if handle_mouse_events is True.
         Override in subclasses for custom click handling.
 
         Args:
@@ -223,7 +223,7 @@ class RoomObject:
 
     def mouse_event(self, mouse_x, mouse_y, button_left, button_middle, button_right):
         """
-        Handles mouse movement and button events.
+        Handles mouse movement and button events, if handle_mouse_events is True.
         Override in subclasses for custom mouse handling.
 
         Args:
