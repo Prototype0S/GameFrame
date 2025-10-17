@@ -22,8 +22,8 @@ class Globals:
     running = True
     FRAMES_PER_SECOND = 30
 
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
+    SCREEN_WIDTH = 1920
+    SCREEN_HEIGHT = 1080
 
     SCORE = 0
 
@@ -31,10 +31,10 @@ class Globals:
     LIVES = 3
 
     # - Set the Window display name - #
-    window_name = 'GF Game'
+    window_name = 'CyberSocial Butterfly'
 
     # - Set the order of the rooms - #
-    levels = ["WelcomeScreen", "Maze", "ScrollingShooter", "BreakOut"]
+    levels = ["WelcomeScreen", "SchoolRoom"]
 
     # - Set the starting level - #
     start_level = 0

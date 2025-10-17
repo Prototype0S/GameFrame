@@ -33,6 +33,11 @@ while Globals.running:
     class_name = getattr(mod, levels[curr_level])
     room = class_name(screen, joysticks)
     exit_val = room.run()
+    if exit_val == "welcome":
+        # Find the index of your welcome screen in levels
+        welcome_index = levels.index("WelcomeScreen")
+        Globals.next_level = welcome_index
+        continue
 
     if exit_val is True or Globals.running is False:
 
@@ -41,7 +46,7 @@ while Globals.running:
         if len(levels) == 1:
             break
 
-    if Globals.exiting:
+    if Globals.exiting:     
         break
 
 sys.exit()
