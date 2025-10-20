@@ -24,8 +24,10 @@ levels = Globals.levels
 
 # - Main Game Loop. Steps through the levels defined in levels[] - #
 while Globals.running:
+    
 
     curr_level = Globals.next_level
+    Globals.level_history.append(curr_level)
     Globals.next_level += 1
     Globals.next_level %= len(levels)
     mod_name = f"Rooms.{levels[curr_level]}"
@@ -33,6 +35,7 @@ while Globals.running:
     class_name = getattr(mod, levels[curr_level])
     room = class_name(screen, joysticks)
     exit_val = room.run()
+
     if exit_val == "welcome":
         # Find the index of your welcome screen in levels
         welcome_index = levels.index("WelcomeScreen")

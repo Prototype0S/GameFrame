@@ -1,2 +1,3 @@
 from Rooms.WelcomeScreen import WelcomeScreen
-from Rooms.SchoolRoom import SchoolRoom
+from Rooms.Path import Path
+from Rooms.School_Pathway import School_Pathway

@@ -68,6 +68,7 @@ class Level:
         self.has_buttons_2 = False
         self.has_hat_1 = False
         self.has_hat_2 = False
+        self.done = False
         if len(self.joysticks) > 0:
             buttons = self.joysticks[0].get_numbuttons()
             if buttons > 0:
@@ -102,17 +103,16 @@ class Level:
         for obj in self.objects:
             self.init_collision_list(obj)
 
+        # ...existing code...
         while self.running:
             self._clock.tick(Globals.FRAMES_PER_SECOND)
-
+            events = pygame.event.get()
             for obj in self.objects:
                 obj.prev_x = obj.x
                 obj.prev_y = obj.y
-
-            # - Process user events - #
-            self.process_user_events()
-            
-            # Call Pre step on all objects
+                # - Process user events - #
+                self.process_user_events()
+                # Call Pre step on all objects
             for item in self.objects:
                 item.prestep()
 
@@ -123,16 +123,51 @@ class Level:
                     self.quitting = True
                     Globals.exiting = True
                     pass
+            if getattr(self, "done", False):
+                self.running = False
+                break
                 # - Check for mouse click and pass to objects registered for mouse events - #
                 if event.type == pygame.MOUSEBUTTONUP:
                     mouse_pos = pygame.mouse.get_pos()
                     for obj in self.mouse_objects:
                         if obj.rect.collidepoint(mouse_pos):
                             obj.clicked(event.button)
+            # single events collection, update prev positions and run prestep
+            events = pygame.event.get()
+
+            for obj in self.objects:
+                obj.prev_x = obj.x
+                obj.prev_y = obj.y
+
+            # - Process user events - #
+            self.process_user_events()
+
+            # Call Pre step on all objects
+            for item in self.objects:
+                item.prestep()
+
+            # process events (QUIT and mouse clicks etc.)
+            for event in events:
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    self.quitting = True
+                    Globals.exiting = True
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    mouse_pos = pygame.mouse.get_pos()
+                    for obj in self.mouse_objects:
+                        if obj.rect.collidepoint(mouse_pos):
+                            obj.clicked(event.button)
+
+            # If a room requested a change, stop this level loop immediately
+            if getattr(self, "done", False):
+                self.running = False
+                break
+# ...existing code...
 
             # -  Check for joystick events and pass  - #
             # - to objects registered for key events - #
             signals = False
+            
             if self.has_buttons_1:
                 for i in range(self.joysticks[0].get_numbuttons()):
                     self.p1_btns[i] = self.joysticks[0].get_button(i)
