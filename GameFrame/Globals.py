@@ -55,3 +55,5 @@ class Globals:
 
     total_count = 0
     destroyed_count = 0
+    School_Pathway_npc_positions = {}
+    path_npc_positions = {}

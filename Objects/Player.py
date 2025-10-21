@@ -7,29 +7,40 @@ class Player(RoomObject):
     A class for the player's avatar (the Ship)
     """
 
-    def __init__(self,  room: "Path", x, y):
+    def __init__(self,  room, x, y):
         super().__init__(room, x, y)
-        self.room: Path = room  # ✅ Explicit type hint
-        image = self.load_image("Ship.png")
-        self.set_image(image, 100, 100)
+        image = self.load_image("Player_right.png")
+        self.set_image(image, 200, 200)
 
         self.handle_key_events = True
 
     def key_pressed(self, key):
         distance = 30
         if key[pygame.K_w]:
+            image = self.load_image("Player_looking_backwards.png")
+            self.set_image(image, 200, 200)
             self.y -= distance
         elif key[pygame.K_s]:
+            image = self.load_image("Player_looking_forwards.png")
+            self.set_image(image, 200, 200)
             self.y += distance
         elif key[pygame.K_a]:
+            image = self.load_image("Player_left.png")
+            self.set_image(image, 200, 200)
             self.x -= distance
         elif key[pygame.K_d]:
+            image = self.load_image("Player_right.png")
+            self.set_image(image, 200, 200)
             self.x += distance
         elif key[pygame.K_ESCAPE]:
             pygame.quit()
             sys.exit()
+        else:
+            image = self.load_image("Player_looking_forwards.png")
+            self.set_image(image, 200, 200)
 
         self.Keep_In_Room()
+        print(f"Player position: ({self.x}, {self.y})")
 
 
         # Trigger room change
@@ -61,5 +72,5 @@ class Player(RoomObject):
             self.y = 100
         if self.x > 1610:
             self.x = 1610
-        if self.y > 850:
-            self.y = 850
+        if self.y > 800:
+            self.y = 800
