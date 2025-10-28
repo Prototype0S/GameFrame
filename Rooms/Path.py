@@ -33,6 +33,7 @@ class Path(Level):
 
         self.done = False
         self.next_level_class = None
+        self.create_banner = False
 
 
     def request_room_change(self, target_room_name):
@@ -41,3 +42,12 @@ class Path(Level):
         if target_room_name == "School_Pathway" and "School_Pathway" in Globals.levels:
             Globals.next_level = Globals.levels.index("School_Pathway")
             self.done = True
+    def update(self, dt):
+        self.text_banner_creation()
+    def text_banner_creation(self):
+        if self.create_banner:
+            print("Creating text banner background")
+            self.set_background_image("Text_Path.png")  # tell GameFrame the new name
+            self.load_background()                      # <--  NEW: refresh the cache
+            self.create_banner = False
+            print("Creating text banner background – flag set, background_changed =", self.background_changed)

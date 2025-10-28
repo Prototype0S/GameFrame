@@ -13,7 +13,7 @@ class Player(RoomObject):
         self.set_image(image, 200, 200)
 
         self.handle_key_events = True
-
+        self.register_collision_object("NPC")
     def key_pressed(self, key):
         distance = 30
         if key[pygame.K_w]:
@@ -40,13 +40,15 @@ class Player(RoomObject):
             self.set_image(image, 200, 200)
 
         self.Keep_In_Room()
-        print(f"Player position: ({self.x}, {self.y})")
+        #print(f"Player position: ({self.x}, {self.y})")
 
 
         # Trigger room change
         if self.x >= 1500 and hasattr(self.room, "request_room_change") and type(self.room).__name__ == "Path":
-                self.room.request_room_change("School_Pathway")
-                print(f"Current room: {type(self.room)}")
+                prev_index =Globals.level_history[-1]
+                Globals.next_level = prev_index + 1
+                self.room.done = True
+                print(f"DEBUG: Going back to {Globals.levels[prev_index]} (index {prev_index})")
         # Trigger to go back to previous room using history
         if self.x <= 200 and hasattr(self.room, "request_room_change") and type(self.room).__name__ == "School_Pathway":
             if len(Globals.level_history) >= 2:
