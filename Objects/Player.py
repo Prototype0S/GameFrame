@@ -1,8 +1,8 @@
 from GameFrame import RoomObject, Globals
 import pygame
-import sys
-import time
-import os
+import sys, time
+#from Hud import Text
+from random import choice
 
 class Player(RoomObject):
     """
@@ -16,31 +16,27 @@ class Player(RoomObject):
 
         self.handle_key_events = True
         self.register_collision_object("NPC")
-
         # Collision tracking
         self._last_npc_collision = 0
         self._collision_timeout = 0.25  # seconds to keep text background visible
+        #self.text = Text(self, 960, 770, self.text)
 
     # ------------------------------------------------------------
     # Utility: force reload of background from disk
     # ------------------------------------------------------------
     def _force_set_background(self, image_name):
         """Force reload the background image even if cached."""
-        try:
-            import pygame, os
-            # Build path relative to this file's directory (not working dir)
-            base_dir = os.path.dirname(os.path.abspath(__file__))  # e.g. ...\Year_9\GameFrame\Objects
-            gameframe_dir = os.path.join(base_dir, "..")           # one level up to GameFrame
-            images_dir = os.path.join(gameframe_dir, "images")     # GameFrame/images
-            full_path = os.path.join(images_dir, image_name)
-            full_path = os.path.normpath(full_path)                # normalize path separators
+        import pygame, os
+        # Build path relative to this file's directory (not working dir)
+        base_dir = os.path.dirname(os.path.abspath(__file__))  # e.g. ...\Year_9\GameFrame\Objects
+        gameframe_dir = os.path.join(base_dir, "..")           # one level up to GameFrame
+        images_dir = os.path.join(gameframe_dir, "images")     # GameFrame/images
+        full_path = os.path.join(images_dir, image_name)
+        full_path = os.path.normpath(full_path)                # normalize path separators
 
-            print(f"Forcing background switch to {image_name} ({full_path})")
-
-            self.room.background_image = pygame.image.load(full_path).convert()
-            self.room.set_background_image(image_name)
-        except Exception as e:
-            print(f"Error forcing background {image_name}: {e}")
+        #print(f"Forcing background switch to {image_name} ({full_path})")
+        self.room.background_image = pygame.image.load(full_path).convert()
+        self.room.set_background_image(image_name)
 
     # ------------------------------------------------------------
     # Handle key inputs and collisions
@@ -84,6 +80,7 @@ class Player(RoomObject):
 
         # Handle room transitions
         self._handle_room_transitions()
+        print(f"Player position: ({self.x}, {self.y})")
 
     # ------------------------------------------------------------
     # Check collisions with NPCs and update background accordingly
@@ -104,6 +101,8 @@ class Player(RoomObject):
             self._last_npc_collision = now
             if type(self.room).__name__ == "Path":
                 self._force_set_background("Text_Path.png")
+                #self.text = choice(["Hi, let's be friends!", "Hello there!", "Good day!", "Hey! Wanna hang out?", "Wanna be friends?", "Yo! Let's be pals!"])
+
             elif type(self.room).__name__ == "School_Pathway":
                 self._force_set_background("School_Path_text.png")
         else:
@@ -136,7 +135,7 @@ class Player(RoomObject):
             prev_index = Globals.level_history[-1]
             Globals.next_level = prev_index + 1
             self.room.done = True
-            print(f"DEBUG: Going back to {Globals.levels[prev_index]} (index {prev_index})")
+            #print(f"DEBUG: Going back to {Globals.levels[prev_index]} (index {prev_index})")
 
         # Move left -> go back
         if self.x <= 200 and hasattr(self.room, "request_room_change") and type(self.room).__name__ == "School_Pathway":
@@ -144,9 +143,9 @@ class Player(RoomObject):
                 prev_index = Globals.level_history[-2]
                 Globals.next_level = prev_index
                 self.room.done = True
-                print(f"DEBUG: Going back to {Globals.levels[prev_index]} (index {prev_index})")
+                #print(f"DEBUG: Going back to {Globals.levels[prev_index]} (index {prev_index})")
             else:
                 if "Path" in Globals.levels:
                     Globals.next_level = Globals.levels.index("Path")
                     self.room.done = True
-                    print("DEBUG: No history, falling back to Path")
+                    #print("DEBUG: No history, falling back to Path")

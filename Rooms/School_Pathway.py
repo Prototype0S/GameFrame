@@ -1,6 +1,7 @@
 from GameFrame import Level, Globals
 from Objects.Player import Player
 from Objects.NPC import NPC
+from Objects.Hud import Score
 import random
 
 class School_Pathway(Level):
@@ -14,6 +15,9 @@ class School_Pathway(Level):
         # Add player
         self.player = Player(self, x, y)
         self.add_room_object(self.player)
+        # add HUD items
+        self.score = Score(self, 960, 200, str(Globals.SCORE))
+        self.add_room_object(self.score)
 
         # NPC positions (cached in Globals)
         if not hasattr(Globals, "School_Pathway_npc_positions"):
