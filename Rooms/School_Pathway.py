@@ -35,6 +35,7 @@ class School_Pathway(Level):
             npc = NPC(self, x, y)
             self.add_room_object(npc)
 
+
     def request_room_change(self, target_room_name):
         print(f"Requesting room change to: {target_room_name}")
         if target_room_name == "Path" and "Path" in Globals.levels:
