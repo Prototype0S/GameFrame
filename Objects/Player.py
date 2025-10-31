@@ -1,8 +1,8 @@
 from GameFrame import RoomObject, Globals
 import pygame
 import sys, time
-#from Hud import Text
 from random import choice
+from Objects.Hud import Text   # make sure this import is here
 
 class Player(RoomObject):
     """
@@ -12,29 +12,27 @@ class Player(RoomObject):
     def __init__(self, room, x, y):
         RoomObject.__init__(self, room, x, y)
         image = self.load_image("Player_right.png")
-        self.set_image(image, 200, 200)
+        self.set_image(image, 284, 413)
 
         self.handle_key_events = True
         self.register_collision_object("NPC")
+
         # Collision tracking
         self._last_npc_collision = 0
-        self._collision_timeout = 0.25  # seconds to keep text background visible
-        #self.text = Text(self, 960, 770, self.text)
+        self._collision_timeout = 0.25  # seconds to keep text visible
 
     # ------------------------------------------------------------
     # Utility: force reload of background from disk
     # ------------------------------------------------------------
     def _force_set_background(self, image_name):
         """Force reload the background image even if cached."""
-        import pygame, os
-        # Build path relative to this file's directory (not working dir)
-        base_dir = os.path.dirname(os.path.abspath(__file__))  # e.g. ...\Year_9\GameFrame\Objects
-        gameframe_dir = os.path.join(base_dir, "..")           # one level up to GameFrame
-        images_dir = os.path.join(gameframe_dir, "images")     # GameFrame/images
+        import os
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        gameframe_dir = os.path.join(base_dir, "..")
+        images_dir = os.path.join(gameframe_dir, "images")
         full_path = os.path.join(images_dir, image_name)
-        full_path = os.path.normpath(full_path)                # normalize path separators
+        full_path = os.path.normpath(full_path)
 
-        #print(f"Forcing background switch to {image_name} ({full_path})")
         self.room.background_image = pygame.image.load(full_path).convert()
         self.room.set_background_image(image_name)
 
@@ -44,7 +42,8 @@ class Player(RoomObject):
     def key_pressed(self, key):
         distance = 30
         moved = False
-
+        if key[pygame.K_LSHIFT]:
+            distance = 60
         if key[pygame.K_w]:
             image = self.load_image("Player_looking_backwards.png")
             self.set_image(image, 200, 200)
@@ -74,44 +73,59 @@ class Player(RoomObject):
 
         self.Keep_In_Room()
 
-        # Only check for collisions when player moves
         if moved:
             self._handle_background_change()
 
-        # Handle room transitions
         self._handle_room_transitions()
         print(f"Player position: ({self.x}, {self.y})")
 
     # ------------------------------------------------------------
-    # Check collisions with NPCs and update background accordingly
+    # Check collisions with NPCs and update background + text
     # ------------------------------------------------------------
     def _handle_background_change(self):
-        """Switch background when colliding with NPC, revert if not."""
         now = time.time()
         colliding = False
 
         for obj in self.room.objects:
-            if getattr(obj, "__class__", type(obj)).__name__ == "NPC":
+            if obj.__class__.__name__ == "NPC":
                 if self.rect.colliderect(obj.rect):
                     colliding = True
                     break
 
-        # Handle current state
         if colliding:
             self._last_npc_collision = now
             if type(self.room).__name__ == "Path":
                 self._force_set_background("Text_Path.png")
-                #self.text = choice(["Hi, let's be friends!", "Hello there!", "Good day!", "Hey! Wanna hang out?", "Wanna be friends?", "Yo! Let's be pals!"])
+                if hasattr(self.room, "friend_text"):
+                    self.room.friend_text.text = choice([
+                        "Hi, let's be friends!",
+                        "Hey! Wanna hang out sometime?",
+                        "Wanna be friends?",
+                        "Yo! Let's be pals!"
+                    ])
+                    self.room.friend_text.render_text()
 
             elif type(self.room).__name__ == "School_Pathway":
                 self._force_set_background("School_Path_text.png")
+                if hasattr(self.room, "friend_text"):
+                    self.room.friend_text.text = choice([
+                        "Hi, let's be friends!",
+                        "Hey! Wanna hang out sometime?",
+                        "Wanna be friends?",
+                        "Yo! Let's be pals!"
+                    ])
+                    self.room.friend_text.render_text()
         else:
-            # If enough time has passed since last collision, revert
-            if now - self._last_npc_collision > self._collision_timeout:
-                if type(self.room).__name__ == "Path":
-                    self._force_set_background("Path.png")
-                elif type(self.room).__name__ == "School_Pathway":
-                    self._force_set_background("School_Path.png")
+            if type(self.room).__name__ == "Path":
+                self._force_set_background("Path.png")
+            elif type(self.room).__name__ == "School_Pathway":
+                self._force_set_background("School_Path.png")
+
+            # clear the HUD text
+            if hasattr(self.room, "friend_text"):
+                self.room.friend_text.text = ""
+                self.room.friend_text.render_text()
+
 
     # ------------------------------------------------------------
     # Keep player inside the visible room
@@ -130,22 +144,17 @@ class Player(RoomObject):
     # Handle transitions between rooms
     # ------------------------------------------------------------
     def _handle_room_transitions(self):
-        # Move right -> go forward
         if self.x >= 1500 and hasattr(self.room, "request_room_change") and type(self.room).__name__ == "Path":
             prev_index = Globals.level_history[-1]
             Globals.next_level = prev_index + 1
             self.room.done = True
-            #print(f"DEBUG: Going back to {Globals.levels[prev_index]} (index {prev_index})")
 
-        # Move left -> go back
         if self.x <= 200 and hasattr(self.room, "request_room_change") and type(self.room).__name__ == "School_Pathway":
             if len(Globals.level_history) >= 2:
                 prev_index = Globals.level_history[-2]
                 Globals.next_level = prev_index
                 self.room.done = True
-                #print(f"DEBUG: Going back to {Globals.levels[prev_index]} (index {prev_index})")
             else:
                 if "Path" in Globals.levels:
                     Globals.next_level = Globals.levels.index("Path")
                     self.room.done = True
-                    #print("DEBUG: No history, falling back to Path")

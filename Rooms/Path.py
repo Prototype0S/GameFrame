@@ -1,7 +1,7 @@
 from GameFrame import Level, Globals
 from Objects.Player import Player
 from Objects.NPC import NPC
-from Objects.Hud import Score
+from Objects.Hud import Score, Text
 import random
 
 class Path(Level):
@@ -16,17 +16,18 @@ class Path(Level):
         self.player = Player(self, 300, 500)
         self.add_room_object(self.player)
 
-        self.score = Score(self, 960, 200, str(Globals.SCORE))
+        self.score = Score(self, 800, 200, f"Score: {Globals.SCORE}")
         self.add_room_object(self.score)
 
-        # NPC positions (cached in Globals)
+        self.friend_text = Text(self, 1520/2, 850, '')
+        self.add_room_object(self.friend_text)
         if not hasattr(Globals, "path_npc_positions"):
             Globals.path_npc_positions = {}
 
         if "Path" in Globals.path_npc_positions:
             positions = Globals.path_npc_positions["Path"]
         else:
-            x_vals = [400, 500, 700, 1400]
+            x_vals = [500, 700, 1400]
             y_vals = [100, 400, 750]
             random.shuffle(x_vals)
             random.shuffle(y_vals)

@@ -6,7 +6,7 @@ class NPC(RoomObject):
         RoomObject.__init__(self, room, x, y)
 
         image = self.load_image("Creep.png")
-        self.set_image(image, 250, 250)
+        self.set_image(image, 225, 225)
         self.register_collision_object("Player")
 
 
