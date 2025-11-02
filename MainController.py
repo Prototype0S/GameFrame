@@ -26,6 +26,7 @@ levels = Globals.levels
 while Globals.running:
     
 
+
     curr_level = Globals.next_level
     Globals.level_history.append(curr_level)
     Globals.next_level += 1
