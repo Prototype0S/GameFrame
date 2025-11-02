@@ -11,7 +11,8 @@ class Score(RoomObject):
 
         self.x = x
         self.y = y
-        self.text = str(text if text is not None else Globals.SCORE)
+        # store numeric score, not prefixed string
+        self.value = Globals.SCORE if text is None else int(text)
         self.size = 60
         self.font_name = "Arial Black"
         self.color = (0, 255, 255)
@@ -22,13 +23,14 @@ class Score(RoomObject):
     def _render_score(self):
         """Render text to a surface so GameFrame can draw it like a RoomObject."""
         font = pygame.font.SysFont(self.font_name, self.size, self.bold)
-        self.image = font.render(self.text, True, self.color)
+        display_text = f"Score: {self.value}"
+        self.image = font.render(display_text, True, self.color)
         self.rect = self.image.get_rect(center=(self.x, self.y))
 
     def update_score(self, change):
         """Update the score and refresh the image."""
         Globals.SCORE += change
-        self.text = str(Globals.SCORE)
+        self.value = Globals.SCORE
         self._render_score()
 
 class Text(RoomObject):

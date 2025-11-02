@@ -16,7 +16,7 @@ class School_Pathway(Level):
         self.player = Player(self, x, y)
         self.add_room_object(self.player)
         # add HUD items
-        self.score = Score(self, 800, 200, f"Score: {Globals.SCORE}")
+        self.score = Score(self, 800, 200)
         self.add_room_object(self.score)
 
         self.friend_text = Text(self, 1520/2, 850, '')

@@ -1,8 +1,8 @@
 from GameFrame import RoomObject, Globals
 import pygame
-import sys, time
+import sys
 from random import choice
-from Objects.Hud import Text   # make sure this import is here
+from Objects.Hud import Text   # HUD text
 
 class Player(RoomObject):
     """
@@ -12,14 +12,13 @@ class Player(RoomObject):
     def __init__(self, room, x, y):
         RoomObject.__init__(self, room, x, y)
         image = self.load_image("Player_right.png")
-        self.set_image(image, 284, 413)
-
+        self.set_image(image, 200, 200)
+        self.interacted = False
         self.handle_key_events = True
         self.register_collision_object("NPC")
 
         # Collision tracking
-        self._last_npc_collision = 0
-        self._collision_timeout = 0.25  # seconds to keep text visible
+        self._in_npc_collision = False  # flag to avoid re-drawing text every frame
 
     # ------------------------------------------------------------
     # Utility: force reload of background from disk
@@ -37,6 +36,22 @@ class Player(RoomObject):
         self.room.set_background_image(image_name)
 
     # ------------------------------------------------------------
+    # Utility: swap sprite image but keep rect size/position
+    # ------------------------------------------------------------
+    def _set_player_image(self, filename):
+        image = self.load_image(filename)
+        old_center = self.rect.center if hasattr(self, "rect") else (self.x, self.y)
+        self.set_image(image, 200, 200)
+        self.rect.center = old_center
+
+        # shrink collision box if needed
+        hitbox_width, hitbox_height = 80, 80
+        self.rect.width = hitbox_width
+        self.rect.height = hitbox_height
+        self.rect.center = old_center
+        
+
+    # ------------------------------------------------------------
     # Handle key inputs and collisions
     # ------------------------------------------------------------
     def key_pressed(self, key):
@@ -44,37 +59,42 @@ class Player(RoomObject):
         moved = False
         if key[pygame.K_LSHIFT]:
             distance = 60
+
         if key[pygame.K_w]:
-            image = self.load_image("Player_looking_backwards.png")
-            self.set_image(image, 200, 200)
+            self._set_player_image("Player_looking_backwards.png")
             self.y -= distance
             moved = True
         elif key[pygame.K_s]:
-            image = self.load_image("Player_looking_forwards.png")
-            self.set_image(image, 200, 200)
+            self._set_player_image("Player_looking_forwards.png")
             self.y += distance
             moved = True
         elif key[pygame.K_a]:
-            image = self.load_image("Player_left.png")
-            self.set_image(image, 200, 200)
+            self._set_player_image("Player_left.png")
             self.x -= distance
             moved = True
         elif key[pygame.K_d]:
-            image = self.load_image("Player_right.png")
-            self.set_image(image, 200, 200)
+            self._set_player_image("Player_right.png")
             self.x += distance
             moved = True
         elif key[pygame.K_ESCAPE]:
             pygame.quit()
             sys.exit()
         else:
-            image = self.load_image("Player_looking_forwards.png")
-            self.set_image(image, 200, 200)
+            self._set_player_image("Player_looking_forwards.png")
 
         self.Keep_In_Room()
 
         if moved:
             self._handle_background_change()
+
+        # Award score if Y is pressed while colliding with an NPC
+        if key[pygame.K_y] and self._in_npc_collision:
+            for obj in self.room.objects:
+                if obj.__class__.__name__ == "NPC" and self.rect.colliderect(obj.rect):
+                    if not getattr(obj, "interacted", False):
+                        obj.interacted = True
+                        if hasattr(self.room, "score"):
+                            self.room.score.update_score(10)
 
         self._handle_room_transitions()
         print(f"Player position: ({self.x}, {self.y})")
@@ -83,7 +103,6 @@ class Player(RoomObject):
     # Check collisions with NPCs and update background + text
     # ------------------------------------------------------------
     def _handle_background_change(self):
-        now = time.time()
         colliding = False
 
         for obj in self.room.objects:
@@ -92,40 +111,30 @@ class Player(RoomObject):
                     colliding = True
                     break
 
-        if colliding:
-            self._last_npc_collision = now
+        if colliding and not self._in_npc_collision:
+            # entering collision
+            self._in_npc_collision = True
+
             if type(self.room).__name__ == "Path":
                 self._force_set_background("Text_Path.png")
-                if hasattr(self.room, "friend_text"):
-                    self.room.friend_text.text = choice([
-                        "Hi, let's be friends!",
-                        "Hey! Wanna hang out sometime?",
-                        "Wanna be friends?",
-                        "Yo! Let's be pals!"
-                    ])
-                    self.room.friend_text.render_text()
-
             elif type(self.room).__name__ == "School_Pathway":
                 self._force_set_background("School_Path_text.png")
-                if hasattr(self.room, "friend_text"):
-                    self.room.friend_text.text = choice([
-                        "Hi, let's be friends!",
-                        "Hey! Wanna hang out sometime?",
-                        "Wanna be friends?",
-                        "Yo! Let's be pals!"
-                    ])
-                    self.room.friend_text.render_text()
-        else:
+
+            if hasattr(self.room, "friend_text"):
+                self.room.friend_text.update_text()
+
+        elif not colliding and self._in_npc_collision:
+            # exiting collision
+            self._in_npc_collision = False
+
             if type(self.room).__name__ == "Path":
                 self._force_set_background("Path.png")
             elif type(self.room).__name__ == "School_Pathway":
                 self._force_set_background("School_Path.png")
 
-            # clear the HUD text
             if hasattr(self.room, "friend_text"):
                 self.room.friend_text.text = ""
                 self.room.friend_text.render_text()
-
 
     # ------------------------------------------------------------
     # Keep player inside the visible room
