@@ -3,6 +3,7 @@ import pygame
 import sys
 from random import choice
 from Objects.Hud import Text   # HUD text
+from Objects.NPC import NPC  # NPC class
 
 class Player(RoomObject):
     """
@@ -93,8 +94,19 @@ class Player(RoomObject):
                 if obj.__class__.__name__ == "NPC" and self.rect.colliderect(obj.rect):
                     if not getattr(obj, "interacted", False):
                         obj.interacted = True
-                        if hasattr(self.room, "score"):
-                            self.room.score.update_score(10)
+                        if hasattr(obj, "score_value") and hasattr(self.room, "score"):
+                            self.room.score.update_score(obj.score_value)
+        elif key[pygame.K_n] and self._in_npc_collision:
+            for obj in self.room.objects:
+                if obj.__class__.__name__ == "NPC" and self.rect.colliderect(obj.rect):
+                    if not getattr(obj, "interacted", False):
+                        obj.interacted = True
+                        if hasattr(self.room, "friend_text"):
+                            self.room.friend_text.text = "Maybe next time!"
+                            self.room.friend_text.render_text()
+                            if hasattr(obj, "worthyness") and hasattr(self.room, "score"):
+                                self.room.score.update_score(obj.worthyness)
+                            
 
         self._handle_room_transitions()
         print(f"Player position: ({self.x}, {self.y})")

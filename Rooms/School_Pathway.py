@@ -5,7 +5,7 @@ from Objects.Hud import Score, Text
 import random
 
 class School_Pathway(Level):
-    def __init__(self, screen, joysticks, x=400, y=500):
+    def __init__(self, screen, joysticks):
         Level.__init__(self, screen, joysticks)
 
         # Default background
@@ -13,7 +13,7 @@ class School_Pathway(Level):
         self.create_banner = False
 
         # Add player
-        self.player = Player(self, x, y)
+        self.player = Player(self, 220, 500)
         self.add_room_object(self.player)
         # add HUD items
         self.score = Score(self, 800, 200)
@@ -22,20 +22,15 @@ class School_Pathway(Level):
         self.friend_text = Text(self, 1520/2, 850, '')
         self.add_room_object(self.friend_text)
 
-        # NPC positions (cached in Globals)
-        if not hasattr(Globals, "School_Pathway_npc_positions"):
-            Globals.School_Pathway_npc_positions = {}
 
-        if "School_Pathway" in Globals.School_Pathway_npc_positions:
-            positions = Globals.School_Pathway_npc_positions["School_Pathway"]
-        else:
-            x_vals = [700, 1000]
-            y_vals = [100, 500, 750]
-            random.shuffle(x_vals)
-            random.shuffle(y_vals)
-            positions = list(zip(x_vals[:2], y_vals[:2]))
-            Globals.School_Pathway_npc_positions["School_Pathway"] = positions
-            print("NPC positions:", positions)
+
+        x_vals = [400, 700, 1000]
+        y_vals = [100, 500, 750]
+        random.shuffle(x_vals)
+        random.shuffle(y_vals)
+        positions = list(zip(x_vals[:2], y_vals[:2]))
+
+        print("NPC positions:", positions)
 
         # Spawn NPCs
         for x, y in positions:

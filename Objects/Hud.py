@@ -50,5 +50,5 @@ class Text(RoomObject):
         self.image = font.render(self.text, True, self.color)
         self.rect = self.image.get_rect(center=(self.x, self.y))
     def update_text(self):
-        self.text = choice(["Hi, let's be friends!", "Hey! Wanna hang out sometime?", "Wanna be friends?", "Yo! Let's be pals!"])
+        self.text = choice(["Hi, let's be friends!", "Hey! Wanna hang out sometime?", "Wanna be friends?", "Yo! Let's be pals!", "Sup! Let's chill together!", "Hey there! Let's connect!", "Let's be buddies!", "Hi! Let's team up!", "Yo! Let's be amigos!"])
         self.render_text()

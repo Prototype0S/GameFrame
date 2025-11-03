@@ -24,7 +24,6 @@ levels = Globals.levels
 
 # - Main Game Loop. Steps through the levels defined in levels[] - #
 while Globals.running:
-    
 
 
     curr_level = Globals.next_level

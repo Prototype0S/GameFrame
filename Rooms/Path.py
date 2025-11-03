@@ -12,28 +12,34 @@ class Path(Level):
         self.set_background_image("Path.png")
         self.create_banner = False
 
-        # Add player
-        self.player = Player(self, 300, 500)
+        # Decide spawn position based on where we came from
+        spawn_x, spawn_y = 300, 500  # default
+        if len(Globals.level_history) >= 2:
+            prev_index = Globals.level_history[-2]
+            prev_level_name = Globals.levels[prev_index]
+            if prev_level_name == "School_Pathway":
+                # e.g. spawn further right if coming from School_Pathway
+                spawn_x, spawn_y = 1400, 500
+
+        # Add player at chosen spawn
+        self.player = Player(self, spawn_x, spawn_y)
         self.add_room_object(self.player)
 
+        # HUD
         self.score = Score(self, 800, 200)
         self.add_room_object(self.score)
 
-        self.friend_text = Text(self, 1520/2, 850, '')
+        self.friend_text = Text(self, 1520//2, 850, '')
         self.add_room_object(self.friend_text)
-        if not hasattr(Globals, "path_npc_positions"):
-            Globals.path_npc_positions = {}
 
-        if "Path" in Globals.path_npc_positions:
-            positions = Globals.path_npc_positions["Path"]
-        else:
-            x_vals = [500, 700, 1400]
-            y_vals = [100, 400, 750]
-            random.shuffle(x_vals)
-            random.shuffle(y_vals)
-            positions = list(zip(x_vals[:3], y_vals[:3]))
-            Globals.path_npc_positions["Path"] = positions
-            print("NPC positions:", positions)
+        # NPC positions
+
+        x_vals = [500, 700, 1400]
+        y_vals = [100, 400, 750]
+        random.shuffle(x_vals)
+        random.shuffle(y_vals)
+        positions = list(zip(x_vals[:3], y_vals[:3]))
+        print("NPC positions:", positions)
 
         # Spawn NPCs
         for x, y in positions:

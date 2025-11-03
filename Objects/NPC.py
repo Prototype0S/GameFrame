@@ -9,5 +9,12 @@ class NPC(RoomObject):
         image = self.load_image(sprite)
         self.set_image(image, 225, 225)
         self.register_collision_object("Player")
+        
+        if sprite == "Creep.png":
+            self.score_value = 5
+            #will add score by 10 if player declines
+            self.worthyness = 10
+        else:
+            self.score_value = 50
 
 
