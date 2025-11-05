@@ -34,7 +34,7 @@ class Globals:
     window_name = 'CyberSocial Butterfly'
 
     # - Set the order of the rooms - #
-    levels = ["WelcomeScreen", "Path", "School_Pathway"]
+    levels = ["WelcomeScreen", "Path", "School_Pathway", "Phone"]
     level_history = []
     # - Set the starting level - #
     start_level = 0

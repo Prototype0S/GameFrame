@@ -16,8 +16,7 @@ for joystick in joysticks:
 
 pygame.display.set_caption(Globals.window_name)
 window_size = (Globals.SCREEN_WIDTH, Globals.SCREEN_HEIGHT)
-screen = pygame.display.set_mode(window_size,
-                                 pygame.DOUBLEBUF, 32)
+screen = pygame.display.set_mode(window_size, pygame.DOUBLEBUF, 32)
 
 Globals.next_level = Globals.start_level
 levels = Globals.levels

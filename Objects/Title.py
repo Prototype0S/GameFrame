@@ -1,5 +1,6 @@
 from GameFrame import RoomObject
 import pygame
+from sys import exit
 
 class Title(RoomObject):
     """
@@ -22,3 +23,6 @@ class Title(RoomObject):
         
         if key[pygame.K_SPACE]:
             self.room.running = False
+        elif key[pygame.K_ESCAPE]:
+            pygame.quit()
+            exit()

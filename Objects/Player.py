@@ -17,6 +17,10 @@ class Player(RoomObject):
         self.interacted = False
         self.handle_key_events = True
         self.register_collision_object("NPC")
+        if not hasattr(Globals, "available_friends"):
+            Globals.available_friends = 5
+        self.available_friends = Globals.available_friends
+        
 
         # Collision tracking
         self._in_npc_collision = False  # flag to avoid re-drawing text every frame
@@ -78,8 +82,12 @@ class Player(RoomObject):
             self.x += distance
             moved = True
         elif key[pygame.K_ESCAPE]:
-            pygame.quit()
-            sys.exit()
+            Globals.next_level = Globals.levels.index("WelcomeScreen")
+            self.room.done = True
+        elif key[pygame.K_e]:
+                Globals.next_level = Globals.levels.index("Phone")
+                self.room.done = True
+
         else:
             self._set_player_image("Player_looking_forwards.png")
 
@@ -94,8 +102,16 @@ class Player(RoomObject):
                 if obj.__class__.__name__ == "NPC" and self.rect.colliderect(obj.rect):
                     if not getattr(obj, "interacted", False):
                         obj.interacted = True
-                        if hasattr(obj, "score_value") and hasattr(self.room, "score"):
+                        if hasattr(obj, "score_value") and hasattr(self.room, "score") and self.available_friends > 0:
                             self.room.score.update_score(obj.score_value)
+                            self.available_friends -= 1
+                            Globals.available_friends = self.available_friends  # ✅ persist
+                            print(self.available_friends)
+                        elif self.available_friends <= 0:
+                            if hasattr(self.room, "friend_text"):
+                                self.room.friend_text.text = "You've already made 5 friends! I guess I can't friend you..."
+                                self.room.friend_text.render_text()
+
         elif key[pygame.K_n] and self._in_npc_collision:
             for obj in self.room.objects:
                 if obj.__class__.__name__ == "NPC" and self.rect.colliderect(obj.rect):
@@ -109,7 +125,7 @@ class Player(RoomObject):
                             
 
         self._handle_room_transitions()
-        print(f"Player position: ({self.x}, {self.y})")
+        #print(f"Player position: ({self.x}, {self.y})")
 
     # ------------------------------------------------------------
     # Check collisions with NPCs and update background + text
@@ -179,3 +195,4 @@ class Player(RoomObject):
                 if "Path" in Globals.levels:
                     Globals.next_level = Globals.levels.index("Path")
                     self.room.done = True
+        
