@@ -23,7 +23,6 @@ class School_Pathway(Level):
         self.add_room_object(self.friend_text)
 
 
-
         x_vals = [400, 700, 1000]
         y_vals = [100, 500, 750]
         random.shuffle(x_vals)

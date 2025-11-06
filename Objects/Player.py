@@ -22,7 +22,7 @@ class Player(RoomObject):
 
         # persist available_friends across rooms
         if not hasattr(Globals, "available_friends"):
-            Globals.available_friends = 5
+            Globals.available_friends = 4
         self.available_friends = Globals.available_friends
 
         # collision tracking
