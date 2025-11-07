@@ -103,69 +103,45 @@ class Level:
         for obj in self.objects:
             self.init_collision_list(obj)
 
-        # ...existing code...
         while self.running:
             self._clock.tick(Globals.FRAMES_PER_SECOND)
+            
+            # SINGLE event collection per frame
             events = pygame.event.get()
+            
+            # Update previous positions
             for obj in self.objects:
                 obj.prev_x = obj.x
                 obj.prev_y = obj.y
-                # - Process user events - #
-                self.process_user_events()
-                # Call Pre step on all objects
-            for item in self.objects:
-                item.prestep()
-
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    self.running = False
-                    self.quitting = True
-                    Globals.exiting = True
-                    pass
-            if getattr(self, "done", False):
-                self.running = False
-                break
-                # - Check for mouse click and pass to objects registered for mouse events - #
-                if event.type == pygame.MOUSEBUTTONUP:
-                    mouse_pos = pygame.mouse.get_pos()
-                    for obj in self.mouse_objects:
-                        if obj.rect.collidepoint(mouse_pos):
-                            obj.clicked(event.button)
-            # single events collection, update prev positions and run prestep
-            events = pygame.event.get()
-
-            for obj in self.objects:
-                obj.prev_x = obj.x
-                obj.prev_y = obj.y
-
-            # - Process user events - #
+            
+            # Process user events
             self.process_user_events()
-
+            
             # Call Pre step on all objects
             for item in self.objects:
                 item.prestep()
-
-            # process events (QUIT and mouse clicks etc.)
+            
+            # Process events (QUIT and mouse clicks etc.)
             for event in events:
                 if event.type == pygame.QUIT:
                     self.running = False
                     self.quitting = True
                     Globals.exiting = True
                 elif event.type == pygame.MOUSEBUTTONUP:
+                    print(f"DEBUG: MOUSEBUTTONUP at {pygame.mouse.get_pos()} button {event.button}")
                     mouse_pos = pygame.mouse.get_pos()
                     for obj in self.mouse_objects:
+                        print(f"  Checking {obj.__class__.__name__} rect={obj.rect}")
                         if obj.rect.collidepoint(mouse_pos):
+                            print(f"  -> Collision! Calling clicked()")
                             obj.clicked(event.button)
-
+            
             # If a room requested a change, stop this level loop immediately
             if getattr(self, "done", False):
                 self.running = False
                 break
-# ...existing code...
-
-            # -  Check for joystick events and pass  - #
-            # - to objects registered for key events - #
+            
+            # Check for joystick events and pass to objects registered for key events
             signals = False
             
             if self.has_buttons_1:
@@ -188,33 +164,32 @@ class Level:
                     self.p1_btns[-i] = self.joysticks[1].get_axis(i)
                     if self.p2_btns[-i] > 0 or self.p2_btns[-i] < 0:
                         signals = True
-
+            
             if signals:
                 for obj in self.keyboard_objects:
                     obj.joy_pad_signal(self.p1_btns, self.p2_btns)
-
-            # - Check for a keyboard event and pass - #
-            # - to objects registered for key events - #
+            
+            # Check for a keyboard event and pass to objects registered for key events
             keys = pygame.key.get_pressed()
             if len(keys):
                 for obj in self.keyboard_objects:
                     obj.key_pressed(keys)
-
-            # - Check for a mouse event and pass - #
-            # - to objects registered for mouse events - #
+            
+            # Check for a mouse event and pass to objects registered for mouse events
             (mouse_x, mouse_y) = pygame.mouse.get_pos()
             (button_left, button_middle, button_right) = pygame.mouse.get_pressed()
             for obj in self.mouse_objects:
-                    obj.mouse_event(mouse_x, mouse_y, button_left, button_middle, button_right)
-
-            # - Handle all other events - #
+                obj.mouse_event(mouse_x, mouse_y, button_left, button_middle, button_right)
+            
+            # Handle all other events
             self.catch_events(events)
-
-            # - Clear the screen - #
+            
+            # Clear the screen
             self.screen.fill(self.background_color)
-            # - Add Background if set - #
+            
+            # Add Background if set
             if self.background_set:
-                # - Scrolling if set - #
+                # Scrolling if set
                 if self.background_scrolling:
                     self.background_y += self.background_scroll_speed
                     if self.background_y >= Globals.SCREEN_HEIGHT:
@@ -223,21 +198,24 @@ class Level:
                     self.screen.blit(self.background_image, (0, self.background_y - Globals.SCREEN_HEIGHT))
                 else:
                     self.screen.blit(self.background_image, (0, 0))
+            
             # Call Update on all objects
             for item in self.objects:
                 item.update()
                 item.step()
-
+            
             # Check collisions
             for item in self.objects:
                 item.check_collisions()
-
+            
+            # Draw all objects
             for item in self.objects:
                 self.screen.blit(item.image, (item.x, item.y))
-
+            
             pygame.display.update()
-
+        
         return self.quitting
+
 
     def set_background_image(self, image_file: str):
         """

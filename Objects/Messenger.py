@@ -2,6 +2,7 @@ from GameFrame import RoomObject, Globals
 import pygame
 import time
 from Objects.Hud import MenuList, Text
+from random import choice
 
 class Messenger(RoomObject):
     def __init__(self, room, x, y):
@@ -9,7 +10,7 @@ class Messenger(RoomObject):
         image = self.load_image("Phone.png")
         self.set_image(image, 1920, 1080)
         self.handle_key_events = True
-
+        self.handle_mouse_events = False
         self.feedback_text = None
 
         # cooldown tracking
@@ -60,7 +61,7 @@ class Messenger(RoomObject):
                 # look up position for this option, fallback to center
                 pos = self.option_positions.get(selected, (1720//2, 800))
 
-                self.feedback_text = Text(self.room, pos[0], pos[1], f"You selected {selected}")
+                self.feedback_text = Text(self.room, pos[0], pos[1], choice(["Hey, there's this loser that we totally should make fun of!","Dude, we GOTTA cyberbully this guy","We need to cyberbully this guy, it'll be hilarious.", "Everyone should gang up on them, they don't belong here.", "Let's spam their inbox until they quit.","We should make a meme about how dumb they are."]))
                 self.feedback_text.depth = 1
                 self.room.add_room_object(self.feedback_text)
                 print("Feedback text created")
