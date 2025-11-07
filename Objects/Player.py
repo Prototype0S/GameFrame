@@ -22,7 +22,7 @@ class Player(RoomObject):
 
         # persist available_friends across rooms
         if not hasattr(Globals, "available_friends"):
-            Globals.available_friends = 4
+            Globals.available_friends = 0
         self.available_friends = Globals.available_friends
 
         # collision tracking
@@ -103,13 +103,13 @@ class Player(RoomObject):
         npc = self._get_colliding_npc()
         if npc and key[pygame.K_y] and not getattr(npc, "interacted", False):
             npc.interacted = True
-            if hasattr(npc, "score_value") and hasattr(self.room, "score") and self.available_friends > 0:
+            if hasattr(npc, "score_value") and hasattr(self.room, "score") and self.available_friends < 4:
                 self.room.score.update_score(npc.score_value)
-                self.available_friends -= 1
+                self.available_friends += 1
                 Globals.available_friends = self.available_friends
                 print(self.available_friends)
-            elif self.available_friends <= 0 and hasattr(self.room, "friend_text"):
-                self.room.friend_text.text = "You've already made 5 friends! I guess I can't friend you..."
+            elif self.available_friends >= 4 and hasattr(self.room, "friend_text"):
+                self.room.friend_text.text = "You've already made 4 friends! I guess I can't friend you..."
                 self.room.friend_text.render_text()
 
         elif npc and key[pygame.K_n] and not getattr(npc, "interacted", False):

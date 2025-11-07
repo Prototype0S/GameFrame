@@ -21,7 +21,7 @@ screen = pygame.display.set_mode(window_size, pygame.DOUBLEBUF, 32)
 Globals.next_level = Globals.start_level
 levels = Globals.levels
 
-# - Main Game Loop. Steps through the levels defined in levels[] - #   
+# - Main Game Loop. Steps through the levels defined in levels[] - #     
 while Globals.running:
 
 

@@ -55,3 +55,4 @@ class Globals:
 
     total_count = 0
     destroyed_count = 0
+    available_friends = 0
