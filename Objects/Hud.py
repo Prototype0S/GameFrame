@@ -110,3 +110,55 @@ class MenuList(RoomObject):
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
+
+class Timer(RoomObject):
+    def __init__(self, room, x, y, duration_seconds):
+        RoomObject.__init__(self, room, x, y)
+        self.x = x
+        self.y = y
+        self.duration = duration_seconds
+        self.remaining = duration_seconds
+        self.size = 30
+        self.font_name = "Arial Black"
+        self.color = (255, 255, 0)  # Yellow for visibility
+        self.bold = True
+        self._last_update_ticks = pygame.time.get_ticks()
+        self.depth = 20  # Make sure it's drawn "on top"
+        self._render_timer()
+    def _render_timer(self):
+        mins = int(self.remaining) // 60
+        secs = int(self.remaining) % 60
+        font = pygame.font.SysFont(self.font_name, self.size, self.bold)
+        display_text = f"Time: {mins:02d}:{secs:02d}"
+        self.image = font.render(display_text, True, self.color)
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
+    def update(self):
+        if self.remaining > 0:
+            now = pygame.time.get_ticks()
+            elapsed = (now - self._last_update_ticks) / 1000.0
+            if elapsed >= 1.0:
+                self.remaining = max(self.remaining - int(elapsed), 0)
+                self._last_update_ticks = now
+                self._render_timer()
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+    def is_time_up(self):
+        return self.remaining <= 0
+    
+
+class ExitOnTimer(RoomObject):
+    def __init__(self, room, delay_seconds):
+        super().__init__(room, 0, 0)
+        self.image = pygame.Surface((0, 0))
+        self.delay_seconds = delay_seconds
+        self.start_ticks = pygame.time.get_ticks()
+        self.active = True
+
+    def update(self):
+        elapsed = (pygame.time.get_ticks() - self.start_ticks) / 1000.0
+        # Optional: print for debugging
+        # print(f"ExitOnTimer: {elapsed}")
+        if elapsed >= self.delay_seconds and self.active:
+            self.active = False
+            pygame.quit()
+            exit()

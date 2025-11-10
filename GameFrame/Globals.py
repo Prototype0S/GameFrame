@@ -34,7 +34,7 @@ class Globals:
     window_name = 'CyberSocial Butterfly'
 
     # - Set the order of the rooms - #
-    levels = ["WelcomeScreen", "Path", "School_Pathway", "Phone"]
+    levels = ["WelcomeScreen", "Path", "School_Pathway", "Phone", "Failure", "Victory"]
     level_history = []
     # - Set the starting level - #
     start_level = 0
@@ -56,3 +56,4 @@ class Globals:
     total_count = 0
     destroyed_count = 0
     total_friends = 0
+    game_timer = None  # Timer global, added when started

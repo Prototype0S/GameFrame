@@ -2,6 +2,7 @@ from GameFrame import RoomObject, Globals
 import pygame
 import os
 from Objects.NPC import NPC
+from Objects.Hud import Timer
 
 class Player(RoomObject):
     """
@@ -166,6 +167,22 @@ class Player(RoomObject):
         self.y = max(100, min(self.y, 780))
 
     def _handle_room_transitions(self):
+    # --- Timer-based ending check ---
+        timer = getattr(Globals, "game_timer", None)
+        if timer and timer.is_time_up():
+            score = getattr(self.room, "score", None)
+            final_score = score.value if score else Globals.SCORE
+            # Decide ending by score (threshold is 100 as an example)
+            if final_score >= 500 and "Victory" in Globals.levels:
+                Globals.next_level = Globals.levels.index("Victory")
+            elif "Failure" in Globals.levels:
+                Globals.next_level = Globals.levels.index("Failure")
+            else:
+                # Fallback in case you don't have those rooms
+                Globals.next_level = Globals.end_game_level
+            self.room.done = True
+            return  # Exit so no further transitions occur
+
         room_name = type(self.room).__name__
         if room_name == "Path" and self.x >= 1500 and hasattr(self.room, "request_room_change"):
             prev_index = Globals.level_history[-1]

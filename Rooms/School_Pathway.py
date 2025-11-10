@@ -17,6 +17,16 @@ class School_Pathway(Level):
         self.friend_text = Text(self, 1520//2, 850, '')
         self.add_room_object(self.friend_text)
 
+        if not hasattr(Globals, "game_timer") or Globals.game_timer is None:
+            Globals.game_timer = Timer(self, 200, 100, 180)  # x=100, y=100, duration=180s
+
+        self.timer = Globals.game_timer
+        self.timer.room = self
+        self.timer.x = 200
+        self.timer.y = 100
+        self.add_room_object(self.timer)
+        self.timer.depth = 20  # Make sure it's drawn on top if there's any HUD layering
+
         x_vals = [400, 700, 1000]
         y_vals = [100, 500, 750]
         random.shuffle(x_vals)
@@ -24,7 +34,6 @@ class School_Pathway(Level):
         positions = list(zip(x_vals[:2], y_vals[:2]))
         print("NPC positions:", positions)
 
-        # Randomly assign type to each NPC
         types = [random.choice(["creep", "nice_friend"]) for _ in positions]
         for (x, y), npc_type in zip(positions, types):
             npc = NPC(self, x, y, npc_type)

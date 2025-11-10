@@ -1,7 +1,7 @@
 from GameFrame import Level, Globals
 from Objects.Player import Player
 from Objects.NPC import NPC
-from Objects.Hud import Score, Text
+from Objects.Hud import Score, Text, Timer
 import random
 
 class Path(Level):
@@ -23,6 +23,17 @@ class Path(Level):
         self.add_room_object(self.score)
         self.friend_text = Text(self, 1520//2, 850, '')
         self.add_room_object(self.friend_text)
+
+        # --- Always add the timer and update its room/position ---
+        if not hasattr(Globals, "game_timer") or Globals.game_timer is None:
+            Globals.game_timer = Timer(self, 200, 100, 180)  # x=100, y=100, duration=180s
+
+        self.timer = Globals.game_timer
+        self.timer.room = self
+        self.timer.x = 200
+        self.timer.y = 100
+        self.add_room_object(self.timer)
+        self.timer.depth = 20  # Make sure it's drawn on top if there's any HUD layering
 
         x_vals = [500, 700, 1400]
         y_vals = [100, 400, 750]
