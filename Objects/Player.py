@@ -11,10 +11,28 @@ class Player(RoomObject):
     def __init__(self, room, x, y):
         super().__init__(room, x, y)
         # Initial player sprite
-        self.set_image(self.load_image("Player_right.png"), 200, 200)
         self.handle_key_events = True
         self.register_collision_object("NPC")
+        self.frame_rate = 4                         # frames change every 4 game frames
+        self.current_frame = 0                      # start at frame 0
+        self.total_frames = 16                      # total number of frames
+        self.num_frames = 4                         # total number of frames per direction
+        self.direction = "down"                     # initial direction
+        self.moving = False
 
+        # set image
+        frames = []                                 # list to hold image frames
+        for index in range(self.total_frames):      # load each image frame from the Character_frames folder
+            frames.append(
+                self.load_image(f"Character_frames\character{index:03}.png")
+            )
+        self.image_frames = {
+            "down": frames[0:4],
+            "up": frames[4:8],
+            "left": frames[8:12],
+            "right": frames[12:16]
+        }                                           # dictionary to hold image frames by direction
+        self.update_image()
         # Persist total_friends
         if not hasattr(Globals, "total_friends"):
             Globals.total_friends = 0
@@ -29,14 +47,12 @@ class Player(RoomObject):
         full_path = os.path.join(images_dir, image_name)
         self.room.background_image = pygame.image.load(full_path).convert()
         self.room.set_background_image(image_name)
-
-    def _set_player_image(self, filename):
-        # Change sprite, keep position
-        image = self.load_image(filename)
-        old_center = self.rect.center
-        self.set_image(image, 200, 200)
-        self.rect.width, self.rect.height = 150, 150
-        self.rect.center = old_center
+        
+    def update_image(self):
+        if self.moving:
+            self.current_frame = (self.current_frame + 1) % self.num_frames                 # increment the frame number
+        self.set_image(self.image_frames[self.direction][self.current_frame], 150, 150)   # set the new image
+        self.set_timer(self.frame_rate, self.update_image)  
 
     def _get_colliding_npc(self):
         for obj in self.room.objects:
@@ -47,25 +63,25 @@ class Player(RoomObject):
     def key_pressed(self, key):
         """Handles all player key movement and NPC interactions."""
         distance = 60 if key[pygame.K_LSHIFT] else 30
-        moved = False
+        self.moving = False
 
         # Movement
         if key[pygame.K_w]:
-            self._set_player_image("Player_looking_backwards.png")
+            self.direction ="up"
             self.y -= distance
-            moved = True
+            self.moving = True
         elif key[pygame.K_s]:
-            self._set_player_image("Player_looking_forwards.png")
+            self.direction = "down"
             self.y += distance
-            moved = True
+            self.moving = True
         elif key[pygame.K_a]:
-            self._set_player_image("Player_left.png")
+            self.direction = "left"
             self.x -= distance
-            moved = True
+            self.moving = True
         elif key[pygame.K_d]:
-            self._set_player_image("Player_right.png")
+            self.direction = "right"
             self.x += distance
-            moved = True
+            self.moving = True
         elif key[pygame.K_ESCAPE]:
             Globals.next_level = Globals.levels.index("WelcomeScreen")
             self.room.done = True
@@ -73,10 +89,9 @@ class Player(RoomObject):
             Globals.next_level = Globals.levels.index("Phone")
             self.room.done = True
         else:
-            self._set_player_image("Player_looking_forwards.png")
-
+            self.moving = False
         self.Keep_In_Room()
-        if moved:
+        if self.moving:
             self._handle_background_change()
         print(self.x, self.y)
 
