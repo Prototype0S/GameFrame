@@ -115,13 +115,7 @@ class Player(RoomObject):
             if hasattr(self.room, "friend_text"):
                 self.room.friend_text.text = "Maybe next time!"
                 self.room.friend_text.render_text()
-            # You can optionally play a sound for declines, e.g. creep sound
-            # Uncomment below if you want:
-            # if hasattr(npc, "npc_type") and npc.npc_type == "creep":
-            #     try:
-            #         npc.sound_to_play.play()
-            #     except Exception as e:
-            #         print("Sound playback error:", e)
+
             if hasattr(npc, "worthyness") and hasattr(self.room, "score"):
                 self.room.score.update_score(npc.worthyness)
 
@@ -153,8 +147,8 @@ class Player(RoomObject):
 
     def Keep_In_Room(self):
         w, h = self.room.screen.get_width(), self.room.screen.get_height()
-        self.x = max(0, min(self.x, w - self.rect.width))
-        self.y = max(0, min(self.y, h - self.rect.height))
+        self.x = max(160, min(self.x, 1560))
+        self.y = max(100, min(self.y, 780))
 
     def _handle_room_transitions(self):
         room_name = type(self.room).__name__
