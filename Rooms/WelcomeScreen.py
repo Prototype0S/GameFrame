@@ -1,6 +1,5 @@
 from GameFrame import Level, Globals
 from Objects.Title import Title
-from Objects.Hud import Timer
 import pygame
 
 class WelcomeScreen(Level):
@@ -25,11 +24,3 @@ class WelcomeScreen(Level):
         
         # play background music
         self.bg_music.play(loops=1)
-        
-        # Timer logic: create/persist and always add as RoomObject
-        if not hasattr(Globals, "game_timer") or Globals.game_timer is None:
-            Globals.game_timer = Timer(self, 1400, 50, 150)  # 2 min 30s
-        
-        self.timer = Globals.game_timer
-        self.timer.room = self  # update .room reference for drawing
-        self.add_room_object(self.timer)
